@@ -1,18 +1,14 @@
-from app import cursor, db
-
-def create_user(data):
-    query = """
-        INSERT INTO users (name, email, password, college, branch, batch, skills, bio, github, linkedin)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        data['name'], data['email'], data['password'], data.get('college'),
-        data.get('branch'), data.get('batch'), data.get('skills'),
-        data.get('bio'), data.get('github'), data.get('linkedin')
-    )
-    cursor.execute(query, values)
-    db.commit()
-
-def get_user_by_email(email):
-    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-    return cursor.fetchone()
+from flask_login import UserMixin
+from app import db
+from datetime import datetime
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.String(255), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(255))
+    picture = db.Column(db.String(512))
+    github= db.Column(db.String(255), unique=True, nullable=True)
+    linkedin= db.Column(db.String(255), unique=True, nullable=True)
+    batch = db.Column(db.Integer, nullable=True)
+    college = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
