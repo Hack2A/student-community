@@ -42,6 +42,7 @@ def callback():
         return jsonify({
             "status": "success",
             "message": "User logged in",
+            "token": token,
             "user": {
                 "id": user.id,
                 "name": user.name,
