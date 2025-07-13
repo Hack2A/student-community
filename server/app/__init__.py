@@ -1,21 +1,33 @@
 from flask import Flask
-from flask_cors import CORS
-import mysql.connector
-from .config import Config
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from config import Config
 
-db = None
-cursor = None
+db = SQLAlchemy()
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
 
 def create_app():
-    global db, cursor
     app = Flask(__name__)
-    CORS(app)
     app.config.from_object(Config)
 
-    db = mysql.connector.connect(**Config.DB_CONFIG)
-    cursor = db.cursor(dictionary=True)
+    db.init_app(app)
+    login_manager.init_app(app)
 
-    from .routes.auth import auth_bp
-    app.register_blueprint(auth_bp)
+    from app.models.userModel import User
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    from app.routes.authRoutes import auth_bp, oauth, register_google_oauth
+    register_google_oauth(app, oauth)  # ✅ OAuth is initialized inside this
+    app.register_blueprint(auth_bp, url_prefix="/auth")
+
+    @app.cli.command("db_create")
+    def db_create():
+        with app.app_context():
+            db.create_all()
+            print("✔ Database created")
 
     return app
