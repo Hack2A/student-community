@@ -13,14 +13,24 @@ const UserAuth = () => {
             const response = await googleLogin(idToken);
             console.log('Google login response:', response);
 
-            navigate('/u/newUser');
+            // Check if login was successful
+            if (response.status === "success") {
+                // Save user data to localStorage or context
+                localStorage.setItem("userData", JSON.stringify(response.user));
+
+                // Navigate to the appropriate page
+                navigate('/u/newUser');
+            } else {
+                alert("Login failed. Please try again.");
+            }
 
         } catch (error: any) {
-            console.log("Error caught in handleGoogleLogin:", error); // Add this
+            console.log("Error caught in handleGoogleLogin:", error);
             if (error?.response?.status === 401) {
-                console.log("Google login error 401 - setIsWaitlisted(true) called"); // Add this
+                console.log("Google login error 401");
+                alert("Invalid credentials. Please try again.");
             } else {
-                console.error("Google login error (other):", error); // Add this
+                console.error("Google login error (other):", error);
                 alert("Google login failed. Please try again.");
             }
         }
