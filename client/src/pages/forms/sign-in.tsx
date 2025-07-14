@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { googleLogin } from '../../services/login-service';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
@@ -6,6 +6,15 @@ import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 const UserAuth = () => {
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Check if user is already logged in
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate('/hackathons');
+        }
+    }, [])
+
 
     const handleGoogleLogin = async (credentialResponse: any) => {
         const idToken = credentialResponse.credential;
@@ -16,23 +25,17 @@ const UserAuth = () => {
             // Check if login was successful
             if (response.status === "success") {
                 // Save user data to localStorage or context
-                localStorage.setItem("userData", JSON.stringify(response.user));
-
+                localStorage.setItem("token", response.token);
                 // Navigate to the appropriate page
-                navigate('/u/newUser');
+                navigate('/u/' + response.id);
             } else {
                 alert("Login failed. Please try again.");
             }
 
         } catch (error: any) {
             console.log("Error caught in handleGoogleLogin:", error);
-            if (error?.response?.status === 401) {
-                console.log("Google login error 401");
-                alert("Invalid credentials. Please try again.");
-            } else {
-                console.error("Google login error (other):", error);
-                alert("Google login failed. Please try again.");
-            }
+            console.error("Google login error (other):", error);
+            alert("Google login failed. Please try again.");
         }
     };
 

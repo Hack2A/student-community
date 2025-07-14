@@ -5,9 +5,11 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
+		"dev:proxy": "vite --mode proxy",
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"preview:proxy": "vite preview --mode proxy"
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.1.11",

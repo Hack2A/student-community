@@ -1,21 +1,21 @@
 import axios from "axios";
 
+export interface GoogleCredentialResponse {
+	credential: string;
+	select_by?: string;
+}
+
 export interface GoogleLoginResponse {
-	status: string;
 	message: string;
+	status: string;
 	token: string;
-	user: {
-		id: string;
-		name: string;
-		email: string;
-		picture: string;
-	};
+	id: string;
 }
 
 export async function googleLogin(
 	idToken: string
 ): Promise<GoogleLoginResponse> {
-	const endpoint = "http://localhost:5000/auth/login";
+	const endpoint = "/api/auth/login";
 	try {
 		const response = await axios.post(endpoint, { token: idToken });
 		const responseData = response.data as GoogleLoginResponse;
