@@ -1,28 +1,33 @@
 import axios from "axios";
 
+export interface GoogleCredentialResponse {
+	credential: string;
+	select_by?: string;
+}
+
 export interface GoogleLoginResponse {
 	message: string;
-	isNewUser: boolean;
-	access_token: string;
-	token_type: string;
+	status: string;
+	token: string;
+	id: string;
 }
 
 export async function googleLogin(
 	idToken: string
 ): Promise<GoogleLoginResponse> {
-	const endpoint = "localhost:5000/auth/login";
+	const endpoint = "/api/auth/login";
 	try {
 		const response = await axios.post(endpoint, { token: idToken });
 		const responseData = response.data as GoogleLoginResponse;
 
 		// Save the token to localStorage
-		localStorage.setItem("userToken", responseData.access_token);
+		localStorage.setItem("userToken", responseData.token);
 
-		// Remove this if using HTTPCookies
-		if (responseData && responseData.access_token) {
+		// Set authorization header for future requests
+		if (responseData && responseData.token) {
 			axios.defaults.headers.common[
 				"Authorization"
-			] = `Bearer ${responseData.access_token}`;
+			] = `Bearer ${responseData.token}`;
 		}
 		return responseData;
 	} catch (error: any) {
